@@ -1,5 +1,5 @@
 ﻿/*
- * By David Barrett, Microsoft Ltd. 2018. Use at your own risk.  No warranties are given.
+ * By David Barrett, Microsoft Ltd. 2018 - 2023. Use at your own risk.  No warranties are given.
  * 
  * DISCLAIMER:
  * THIS CODE IS SAMPLE CODE. THESE SAMPLES ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
@@ -12,43 +12,50 @@
  * */
 
 using System;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
 using Logging;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SMTPTestSuite
 {
     public partial class FormMain : Form
     {
-        SmtpMock smtpMock = null;
+        SmtpMock _smtpMock = null;
         Logger _logger = null;
         Encoding.FormBase64 _formBase64 = null;
-        string _messageLogFolder = "";
+        private ClassFormConfig _formConfig = null;
 
         public FormMain()
         {
             InitializeComponent();
+            // Add our form configuration helper
+
             _logger = new Logger(false, "");
             _logger.LogListBox = listBoxLog;
             _logger.LogListBoxAutoScroll = true;
-            smtpMock = new SmtpMock(_logger);
-            smtpMock.Start();
+            _smtpMock = new SmtpMock(_logger);
+            _smtpMock.Start();
+
+            _formConfig = new ClassFormConfig(this, true, true);
+            _formConfig.ExcludedControls.Add(listBoxLog);
+            _formConfig.ExcludedControls.Add(textBoxLogEntry);
+            _formConfig.Initialise();
+            //listBoxLog.Focus();
         }
 
         private void buttonExit_Click(object sender, EventArgs e)
         {
-            smtpMock.Stop();
-            smtpMock = null;
-            this.Dispose();
-        }
-
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
+            _smtpMock.Stop();
+            _smtpMock = null;
+            Close();
+            Dispose();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            smtpMock.Stop();
-            smtpMock = null;
+            _smtpMock?.Stop();
+            _smtpMock = null;
         }
 
         private void buttonSMTPSend_Click(object sender, EventArgs e)
@@ -61,7 +68,7 @@ namespace SMTPTestSuite
         {
             try
             {
-                smtpMock.OpenRelay = !checkBoxRequireAuth.Checked;
+                _smtpMock.OpenRelay = !checkBoxRequireAuth.Checked;
             }
             catch { }
         }
@@ -69,6 +76,7 @@ namespace SMTPTestSuite
         private void buttonClearLog_Click(object sender, EventArgs e)
         {
             listBoxLog.Items.Clear();
+            textBoxLogEntry.Clear();
         }
 
         private void buttonSendRaw_Click(object sender, EventArgs e)
@@ -99,19 +107,20 @@ namespace SMTPTestSuite
 
         private void buttonChooseLogFolder_Click(object sender, EventArgs e)
         {
-            System.Windows.Forms.OpenFileDialog oDialog = new OpenFileDialog();
+            System.Windows.Forms.SaveFileDialog oDialog = new SaveFileDialog();
             try
             {
-                oDialog.FileName = _logger.LogFile;
+                oDialog.FileName = textBoxLogFile.Text;
             }
             catch
             {
             }
-            oDialog.Filter = "Text files (*.txt)|*.txt|Log files (*.log)|*.log|All files (*.*)|*.* ";
+            oDialog.Filter = "Log files (*.log)|*.log|Text files (*.txt)|*.txt|All files (*.*)|*.* ";
             DialogResult result = oDialog.ShowDialog(this);
             if (result != System.Windows.Forms.DialogResult.OK)
                 return;
-            _logger.LogFile = oDialog.FileName;
+            
+            textBoxLogFile.Text = oDialog.FileName;
         }
 
         private void buttonChooseMessageFolder_Click(object sender, EventArgs e)
@@ -119,7 +128,8 @@ namespace SMTPTestSuite
             System.Windows.Forms.FolderBrowserDialog oDialog = new FolderBrowserDialog();
             try
             {
-                oDialog.SelectedPath = System.IO.Path.GetFullPath(_messageLogFolder);
+                if (!String.IsNullOrEmpty(textBoxReceivedMessagesFolder.Text))
+                    oDialog.SelectedPath = System.IO.Path.GetFullPath(textBoxReceivedMessagesFolder.Text);
             }
             catch
             {
@@ -129,29 +139,145 @@ namespace SMTPTestSuite
             DialogResult result = oDialog.ShowDialog(this);
             if (result != System.Windows.Forms.DialogResult.OK)
                 return;
-            _messageLogFolder = oDialog.SelectedPath;
-            textBoxReceivedMessagesFolder.Text = _messageLogFolder;
+            textBoxReceivedMessagesFolder.Text = oDialog.SelectedPath;
         }
 
         private void textBoxReceivedMessagesFolder_TextChanged(object sender, EventArgs e)
         {
-            smtpMock.MessageStoreFolder = textBoxReceivedMessagesFolder.Text;
+            _smtpMock.MessageStoreFolder = textBoxReceivedMessagesFolder.Text;
+            //_formConfig.SaveConfig();
         }
 
         private void checkBoxRejectAllMessages_CheckedChanged(object sender, EventArgs e)
         {
             if (checkBoxRejectAllMessages.Checked)
             {
-                smtpMock.RejectMessage = comboBoxRejectionCode.Text;
+                _smtpMock.RejectMessage = comboBoxRejectionCode.Text;
             }
             else
-                smtpMock.RejectMessage = String.Empty;
+                _smtpMock.RejectMessage = String.Empty;
         }
 
         private void comboBoxRejectionCode_TextUpdate(object sender, EventArgs e)
         {
             if (checkBoxRejectAllMessages.Checked)
-                smtpMock.RejectMessage = comboBoxRejectionCode.Text;
+                _smtpMock.RejectMessage = comboBoxRejectionCode.Text;
+        }
+
+        private void checkBoxEnableTLS_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxEnableTLS.Checked)
+            {
+                PopulateCertificates();
+                if (comboBoxTLSCertificate.Items.Count < 1)
+                    checkBoxEnableTLS.Checked = false;
+                else if (comboBoxTLSCertificate.Items.Count == 1)
+                    comboBoxTLSCertificate.SelectedIndex = 0;
+            }
+            else
+                _smtpMock.TLSCertificate = null;
+        }
+
+        private void PopulateCertificates()
+        {
+            // Populate combobox with any valid certificates found in their store
+
+            X509Store x509Store = null;
+            comboBoxTLSCertificate.Items.Clear();
+            try
+            {
+                x509Store = new X509Store("MY", StoreLocation.CurrentUser);
+                x509Store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
+            }
+            catch { }
+
+            if (x509Store == null)
+                return;
+
+            // Store opened ok, so now we read the certificates
+            foreach (X509Certificate2 x509Cert in x509Store.Certificates)
+            {
+                try
+                {
+                    comboBoxTLSCertificate.Items.Add(x509Cert);
+                }
+                catch { }
+            }
+
+            x509Store.Close();
+        }
+
+        private void comboBoxTLSCertificate_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxTLSCertificate.SelectedIndex < 0)
+                return;
+
+            _smtpMock.TLSCertificate = (X509Certificate)comboBoxTLSCertificate.SelectedItem;
+        }
+
+        private void checkBoxValidateDomain_CheckedChanged(object sender, EventArgs e)
+        {
+            _smtpMock.AcceptedDomainList.Clear();
+            if (checkBoxValidateDomain.Checked)
+            {
+                if (listBoxDomains.Items.Count > 0)
+                    for (int i = 0; i < listBoxDomains.Items.Count; i++)
+                        _smtpMock.AcceptedDomainList.Add(((string)listBoxDomains.Items[i]).ToLower());
+                else
+                    checkBoxValidateDomain.Checked = false;
+            }
+        }
+
+        private void buttonAddDomain_Click(object sender, EventArgs e)
+        {
+            using (FormUserPrompt formUserPrompt = new FormUserPrompt())
+            {
+                string newDomain = formUserPrompt.PromptForInput("Enter domain to accept email for", "Add domain", this);
+                if (String.IsNullOrEmpty(newDomain))
+                    return;
+                listBoxDomains.Items.Add(newDomain);
+                checkBoxValidateDomain_CheckedChanged(this, null);
+            }
+        }
+
+        private void buttonRemoveDomain_Click(object sender, EventArgs e)
+        {
+            if (listBoxDomains.SelectedIndex < 0)
+                return;
+
+            listBoxDomains.Items.RemoveAt(listBoxDomains.SelectedIndex);
+            checkBoxValidateDomain_CheckedChanged(this, null);
+        }
+
+
+        private void textBoxLogFile_TextChanged(object sender, EventArgs e)
+        {
+            if (!String.IsNullOrEmpty(textBoxLogFile.Text))
+                _logger.LogFile = textBoxLogFile.Text;
+            //_formConfig.SaveConfig();
+        }
+
+        private void checkBoxEnableSpamhaus_CheckedChanged(object sender, EventArgs e)
+        {
+            _smtpMock.ConnectionValidator.CheckSpamhaus = checkBoxEnableSpamhaus.Checked;
+            checkBoxBlockSpamhaus.Enabled = checkBoxEnableSpamhaus.Checked;
+        }
+
+        private void checkBoxFolderPerRecipient_CheckedChanged(object sender, EventArgs e)
+        {
+            _smtpMock.UseRecipientSubfolders = checkBoxFolderPerRecipient.Checked;
+            //_formConfig.SaveConfig();
+        }
+
+        private void checkBoxBlockSpamhaus_CheckedChanged(object sender, EventArgs e)
+        {
+            _smtpMock.ConnectionValidator.BlockSpamhaus = checkBoxBlockSpamhaus.Checked;
+        }
+
+        private void listBoxLog_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                listBoxLog.SelectedIndex = -1;
         }
     }
 }

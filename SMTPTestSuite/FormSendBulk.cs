@@ -86,6 +86,10 @@ namespace SMTPTestSuite
         {
             int lInterval = (int)(numericUpDownSendDelay.Value * 1000);
             if (lInterval < 1) lInterval = 1;
+
+            if (numericUpDownMessageNum.Value >= numericUpDownStopMessageNumber.Value)
+                numericUpDownStopMessageNumber.Value = numericUpDownMessageNum.Value + 1;
+
             timerSend.Interval = 1; // Trigger the first send immediately
             timerSend.Start();
             buttonStart.Enabled = false;

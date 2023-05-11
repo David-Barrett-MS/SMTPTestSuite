@@ -55,12 +55,13 @@ namespace Logging
             {
                 try
                 {
-                    oLogFile.Close();
+                    if (oLogFile != null)
+                        oLogFile.Close();
                 }
                 catch { }
                 oLogFile = null;
                 sLogToFile = value;
-                if (sLogToFile != "")
+                if (!String.IsNullOrEmpty(sLogToFile))
                     oLogFile = File.AppendText(sLogToFile);
             }
         }

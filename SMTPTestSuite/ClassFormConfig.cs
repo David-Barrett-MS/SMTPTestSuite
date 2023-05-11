@@ -30,18 +30,24 @@ namespace SMTPTestSuite
         private bool _encryptData = true;
         private bool _storeButtonInfo = false;
         private bool _storeLabelInfo = false;
+        private bool _storeCheckboxText = false;
+        private bool _storeRadioButtonText = false;
         static Dictionary<string, string> _formsConfig = null;
         private List<string> _controlTypesExcludedFromRecursion = new List<string>();
+        public List<Control> ExcludedControls { get; } = new List<Control>();
 
         public ClassFormConfig(System.Windows.Forms.Form form)
         {
             Initialise(form);
         }
 
-        public ClassFormConfig(Form form, bool Encrypt)
+        public ClassFormConfig(Form form, bool Encrypt, bool InitForm = false)
         {
             _encryptData = Encrypt;
-            Initialise(form);
+            if (InitForm)
+                Initialise(form);
+            else
+                _form = form;
         }
 
         public ClassFormConfig(System.Windows.Forms.Form form, string configFile)
@@ -61,6 +67,18 @@ namespace SMTPTestSuite
         private void _form_FormClosing(object sender, FormClosingEventArgs e)
         {
             SaveFormValues(_configFile);
+        }
+
+        public void SaveConfig()
+        {
+            SaveFormValues(_configFile);
+        }
+
+        public void Initialise()
+        {
+            if (_form == null)
+                return;
+            Initialise(_form);
         }
 
         private void Initialise(Form form)
@@ -181,18 +199,22 @@ namespace SMTPTestSuite
 
             if ((control is Label) && !_storeLabelInfo) return;
             if ((control is Button) && !_storeButtonInfo) return;
+            if (ExcludedControls.Contains(control)) return;
             if (control.Tag != null)
             {
                 if (control.Tag.Equals("NoConfigSave"))
                     return;  // This control isn't being stored
             }
 
-            if (control.Tag != null)
-            {
-                if (!control.Tag.Equals("NoTextSave"))
-                    appSettings.AppendLine(control.Name + ":Text:" + Encode(control.Text));
-            }
-            else
+            bool storeText = true;
+            if (!_storeCheckboxText && control is CheckBox)
+                storeText = false;
+            if (!_storeRadioButtonText && control is RadioButton)
+                storeText = false;
+            if (control.Tag != null && control.Tag.Equals("NoTextSave"))
+                storeText = false;
+
+            if (storeText)
                 appSettings.AppendLine(control.Name + ":Text:" + Encode(control.Text));
 
             PropertyInfo prop = control.GetType().GetProperty("SelectedIndex", BindingFlags.Public | BindingFlags.Instance);

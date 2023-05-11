@@ -34,6 +34,7 @@
             this.textBoxRCPTTO = new System.Windows.Forms.TextBox();
             this.textBoxMAILFROM = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.buttonUpdateMessageId = new System.Windows.Forms.Button();
             this.textBoxDATA = new System.Windows.Forms.TextBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -52,6 +53,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.textBoxRCPTTO);
@@ -83,6 +86,8 @@
             // 
             // textBoxRCPTTO
             // 
+            this.textBoxRCPTTO.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxRCPTTO.Location = new System.Drawing.Point(81, 45);
             this.textBoxRCPTTO.Name = "textBoxRCPTTO";
             this.textBoxRCPTTO.Size = new System.Drawing.Size(386, 20);
@@ -91,6 +96,8 @@
             // 
             // textBoxMAILFROM
             // 
+            this.textBoxMAILFROM.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxMAILFROM.Location = new System.Drawing.Point(81, 19);
             this.textBoxMAILFROM.Name = "textBoxMAILFROM";
             this.textBoxMAILFROM.Size = new System.Drawing.Size(386, 20);
@@ -102,27 +109,43 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.buttonUpdateMessageId);
             this.groupBox2.Controls.Add(this.textBoxDATA);
             this.groupBox2.Location = new System.Drawing.Point(12, 151);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(472, 253);
+            this.groupBox2.Size = new System.Drawing.Size(472, 227);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "DATA (message, including headers, excluding <CRLF>.<CRLF>)";
             // 
+            // buttonUpdateMessageId
+            // 
+            this.buttonUpdateMessageId.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonUpdateMessageId.Location = new System.Drawing.Point(352, 198);
+            this.buttonUpdateMessageId.Name = "buttonUpdateMessageId";
+            this.buttonUpdateMessageId.Size = new System.Drawing.Size(114, 23);
+            this.buttonUpdateMessageId.TabIndex = 8;
+            this.buttonUpdateMessageId.Text = "Update message Id";
+            this.buttonUpdateMessageId.UseVisualStyleBackColor = true;
+            this.buttonUpdateMessageId.Click += new System.EventHandler(this.buttonUpdateMessageId_Click);
+            // 
             // textBoxDATA
             // 
             this.textBoxDATA.AcceptsReturn = true;
-            this.textBoxDATA.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxDATA.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxDATA.Location = new System.Drawing.Point(3, 16);
             this.textBoxDATA.Multiline = true;
             this.textBoxDATA.Name = "textBoxDATA";
             this.textBoxDATA.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxDATA.Size = new System.Drawing.Size(466, 234);
+            this.textBoxDATA.Size = new System.Drawing.Size(463, 176);
             this.textBoxDATA.TabIndex = 0;
             // 
             // groupBox3
             // 
+            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox3.Controls.Add(this.label4);
             this.groupBox3.Controls.Add(this.label3);
             this.groupBox3.Controls.Add(this.textBoxSMTPServerPort);
@@ -136,6 +159,7 @@
             // 
             // label4
             // 
+            this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(332, 22);
             this.label4.Name = "label4";
@@ -154,6 +178,7 @@
             // 
             // textBoxSMTPServerPort
             // 
+            this.textBoxSMTPServerPort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxSMTPServerPort.Location = new System.Drawing.Point(367, 19);
             this.textBoxSMTPServerPort.Name = "textBoxSMTPServerPort";
             this.textBoxSMTPServerPort.Size = new System.Drawing.Size(100, 20);
@@ -162,6 +187,8 @@
             // 
             // textBoxSMTPServer
             // 
+            this.textBoxSMTPServer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxSMTPServer.Location = new System.Drawing.Point(60, 19);
             this.textBoxSMTPServer.Name = "textBoxSMTPServer";
             this.textBoxSMTPServer.Size = new System.Drawing.Size(266, 20);
@@ -173,7 +200,7 @@
             this.listBoxLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxLog.FormattingEnabled = true;
-            this.listBoxLog.Location = new System.Drawing.Point(12, 410);
+            this.listBoxLog.Location = new System.Drawing.Point(12, 384);
             this.listBoxLog.Name = "listBoxLog";
             this.listBoxLog.Size = new System.Drawing.Size(553, 160);
             this.listBoxLog.TabIndex = 3;
@@ -182,7 +209,7 @@
             // buttonSend
             // 
             this.buttonSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonSend.Location = new System.Drawing.Point(490, 381);
+            this.buttonSend.Location = new System.Drawing.Point(490, 355);
             this.buttonSend.Name = "buttonSend";
             this.buttonSend.Size = new System.Drawing.Size(75, 23);
             this.buttonSend.TabIndex = 4;
@@ -203,8 +230,9 @@
             // 
             // checkBoxStartTLS
             // 
+            this.checkBoxStartTLS.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBoxStartTLS.AutoSize = true;
-            this.checkBoxStartTLS.Location = new System.Drawing.Point(491, 358);
+            this.checkBoxStartTLS.Location = new System.Drawing.Point(491, 332);
             this.checkBoxStartTLS.Name = "checkBoxStartTLS";
             this.checkBoxStartTLS.Size = new System.Drawing.Size(82, 17);
             this.checkBoxStartTLS.TabIndex = 6;
@@ -213,8 +241,9 @@
             // 
             // checkBoxAcceptAllCerts
             // 
+            this.checkBoxAcceptAllCerts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBoxAcceptAllCerts.AutoSize = true;
-            this.checkBoxAcceptAllCerts.Location = new System.Drawing.Point(491, 337);
+            this.checkBoxAcceptAllCerts.Location = new System.Drawing.Point(491, 311);
             this.checkBoxAcceptAllCerts.Name = "checkBoxAcceptAllCerts";
             this.checkBoxAcceptAllCerts.Size = new System.Drawing.Size(73, 17);
             this.checkBoxAcceptAllCerts.TabIndex = 7;
@@ -225,7 +254,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(578, 581);
+            this.ClientSize = new System.Drawing.Size(578, 555);
             this.Controls.Add(this.checkBoxAcceptAllCerts);
             this.Controls.Add(this.checkBoxStartTLS);
             this.Controls.Add(this.buttonClose);
@@ -267,5 +296,6 @@
         private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.CheckBox checkBoxStartTLS;
         private System.Windows.Forms.CheckBox checkBoxAcceptAllCerts;
+        private System.Windows.Forms.Button buttonUpdateMessageId;
     }
 }

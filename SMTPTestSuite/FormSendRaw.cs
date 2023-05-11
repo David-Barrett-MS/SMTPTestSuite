@@ -57,5 +57,27 @@ namespace SMTPTestSuite
             }
             catch { }
         }
+
+        private void buttonUpdateMessageId_Click(object sender, EventArgs e)
+        {
+            // Search for message Id header and replace with new Id (or add header)
+
+            string messageIdHeader = $"Message-ID: <{Guid.NewGuid()}@smtptestsuite.app>";
+
+            int i = textBoxDATA.Text.IndexOf("Message-ID: ");
+            if (i < 0)
+            {
+                textBoxDATA.Text = $"{messageIdHeader}{Environment.NewLine}{textBoxDATA.Text}";
+                return;
+            }
+
+            int j = textBoxDATA.Text.IndexOf(Environment.NewLine, i);
+            if (j < 0)
+                textBoxDATA.Text = $"{textBoxDATA.Text.Substring(0, i)}{messageIdHeader}";
+            else
+                textBoxDATA.Text = $"{textBoxDATA.Text.Substring(0, i)}{messageIdHeader}{textBoxDATA.Text.Substring(j)}";
+        }
+
+
     }
 }
